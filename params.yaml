@@ -1,0 +1,32 @@
+base:
+  project: sentiment-analysis
+  random_state: 42
+  target_col: airline_sentiment
+
+data_source:
+  raw_dataset_path: data/raw/airline_sentiment_analysis.csv
+
+clean_dataset:
+  clean_dataset_path: data/interim/data_clean.csv
+
+build_features:
+  feature_dataset_path: data/interim/data_features.csv
+
+split_dataset:
+  train_path: data/processed/train.csv
+  dev_path: data/processed/dev.csv
+  test_path: data/processed/test.csv
+  dev_size: 0.1
+  test_size: 0.1
+
+estimators:
+  LogisticRegression:
+    params:
+      C: 1.0
+      l1_ratio: 0.4
+
+model_dir: models
+
+reports:
+  params: reports/params.json
+  scores: reports/scores.json

@@ -1,0 +1,9 @@
+stages:
+  clean_dataset:
+    cmd: python3 src/data/clean_dataset.py --config=params.yaml
+    deps:
+      - src/data/clean_dataset.py
+      - data/raw/airline_sentiment_analysis.csv
+      - src/utils.py
+    outs:
+      - data/interim/data_clean.csv

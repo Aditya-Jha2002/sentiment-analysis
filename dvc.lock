@@ -1,0 +1,18 @@
+schema: '2.0'
+stages:
+  clean_dataset:
+    cmd: python3 src/data/clean_dataset.py --config=params.yaml
+    deps:
+    - path: data/raw/airline_sentiment_analysis.csv
+      md5: 79c94e0f09cfc1fe2f28d595b138cb02
+      size: 1435353
+    - path: src/data/clean_dataset.py
+      md5: f42d0234e91c0de76614ca4c61ec3352
+      size: 3181
+    - path: src/utils.py
+      md5: aacb0a9bb2fc10515b9f9c07638e5d73
+      size: 2599
+    outs:
+    - path: data/interim/data_clean.csv
+      md5: 8f6b7c87cf3de3a8e180e6e0f8da9d25
+      size: 768615
