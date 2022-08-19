@@ -17,6 +17,7 @@ clean_dataset:
 
 build_features:
   feature_data_path: data/interim/data_features.csv
+  tfv_artifact_path: src/feature/tfv_features.pkl
 
 estimators:
   LogisticRegression:
