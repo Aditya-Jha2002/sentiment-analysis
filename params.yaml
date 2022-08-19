@@ -4,20 +4,19 @@ base:
   target_col: airline_sentiment
 
 data_source:
-  raw_dataset_path: data/raw/airline_sentiment_analysis.csv
+  raw_data_path: data/raw/airline_sentiment_analysis.csv
+
+cv_folds_dataset:
+  folds_data_path: data/interim/data_folds.csv
+  fold_num: 5
+  test_data_path: data/processed/test.csv
+  test_size: 0.13
 
 clean_dataset:
-  clean_dataset_path: data/interim/data_clean.csv
+  clean_data_path: data/interim/data_clean.csv
 
 build_features:
-  feature_dataset_path: data/interim/data_features.csv
-
-split_dataset:
-  train_path: data/processed/train.csv
-  dev_path: data/processed/dev.csv
-  test_path: data/processed/test.csv
-  dev_size: 0.1
-  test_size: 0.1
+  feature_data_path: data/interim/data_features.csv
 
 estimators:
   LogisticRegression:

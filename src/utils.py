@@ -11,7 +11,7 @@ class Utils():
         return config
 
     def get_data(self, data_path):
-        df = pd.read_csv(data_path, sep=",", encoding="utf-8")
+        df = pd.read_csv(data_path)
         return df
 
 contractions = {

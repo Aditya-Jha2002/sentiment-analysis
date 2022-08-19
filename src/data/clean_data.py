@@ -4,6 +4,8 @@ import argparse
 from src import utils
 import string
 import nltk
+import emoji
+
 from nltk.stem.porter import PorterStemmer
 from nltk.corpus import stopwords
 nltk.download('stopwords')
@@ -13,19 +15,20 @@ class DataLoader():
     """
     def __init__(self, config_path):
         config = utils.Utils().read_params(config_path)
-        self.raw_data_path = config["data_source"]["raw_dataset_path"]
-        self.clean_data_path = config["clean_dataset"]["clean_dataset_path"]
+        self.cvfolds_data_path = config["cv_folds_dataset"]["folds_data_path"]
+        self.clean_data_path = config["clean_dataset"]["clean_data_path"]
 
     def clean_dataset(self):
-        """ Runs preprocessing scripts to turn raw data from (../raw) into
+        """ Runs preprocessing scripts to turn folds data from (../interim) into
             cleaned and pre-processed data ready to be feature engineered on (saved in ../interim).
         """
         # Load the raw data
-        df = utils.Utils().get_data(self.raw_data_path)
-        # Drop the columns that are not needed
-        df.drop("Unnamed: 0", axis=1, inplace=True)
+        df = utils.Utils().get_data(self.cvfolds_data_path)
         # Preprocess the text
         df['text'] = df['text'].apply(self.preprocess_text)
+        # Label encode the labels
+        df['airline_sentiment'] = df['airline_sentiment'].map({'negative': 0, 'positive': 1})
+
         # Save the clean data
         df.to_csv(self.clean_data_path, sep=",", index=False)
 
@@ -35,10 +38,12 @@ class DataLoader():
         text = text.lower()
         text = self._remove_contractions(text)
         text = self._remove_mentions(text)
+        text = self._remove_emoji(text)
         text = self._remove_urls(text)
         text = self._remove_stopwords(text)
         text = self._remove_punctuation(text)
         text = self._stem_words(text)
+        
         
         return text
 
@@ -57,6 +62,11 @@ class DataLoader():
     def _remove_mentions(self, text: str) -> str:
         """To remove the mentions from text"""
         text = re.sub(r'@[^ ]+', '', text)
+        return text
+
+    def _remove_emoji(self, text: str) -> str:
+        """To remove the emoji from text"""
+        text = emoji.demojize(text)
         return text
 
     def _remove_urls(self, text: str) -> str:
@@ -80,7 +90,6 @@ class DataLoader():
         stemmer = PorterStemmer()
         text = [stemmer.stem(word) for word in text.split()]
         return " ".join(text)
-
  
 if __name__ == '__main__':
     args = argparse.ArgumentParser()

@@ -1,9 +1,19 @@
 stages:
-  clean_dataset:
-    cmd: python3 src/data/clean_dataset.py --config=params.yaml
+  create_folds_dataset:
+    cmd: python3 src/data/create_folds_data.py --config=params.yaml
     deps:
-      - src/data/clean_dataset.py
+      - src/data/create_folds_data.py
       - data/raw/airline_sentiment_analysis.csv
+      - src/utils.py
+    outs:
+      - data/processed/test.csv
+      - data/interim/data_folds.csv
+
+  clean_dataset:
+    cmd: python3 src/data/clean_data.py --config=params.yaml
+    deps:
+      - src/data/clean_data.py
+      - data/interim/data_folds.csv
       - src/utils.py
     outs:
       - data/interim/data_clean.csv

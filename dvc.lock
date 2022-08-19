@@ -1,18 +1,37 @@
 schema: '2.0'
 stages:
   clean_dataset:
-    cmd: python3 src/data/clean_dataset.py --config=params.yaml
+    cmd: python3 src/data/clean_data.py --config=params.yaml
+    deps:
+    - path: data/interim/data_folds.csv
+      md5: 4496bfe4a244b22800bcbb5788fb16f1
+      size: 1215449
+    - path: src/data/clean_data.py
+      md5: 4a305303dda2cdfa0469b322c1c33eae
+      size: 3477
+    - path: src/utils.py
+      md5: 6c586ab7ec87f673f7aaea03c60639a0
+      size: 2572
+    outs:
+    - path: data/interim/data_clean.csv
+      md5: 3b95daf6ae715c7463454d85d0d55911
+      size: 623166
+  create_folds_dataset:
+    cmd: python3 src/data/create_folds_data.py --config=params.yaml
     deps:
     - path: data/raw/airline_sentiment_analysis.csv
       md5: 79c94e0f09cfc1fe2f28d595b138cb02
       size: 1435353
-    - path: src/data/clean_dataset.py
-      md5: f42d0234e91c0de76614ca4c61ec3352
-      size: 3181
+    - path: src/data/create_folds_data.py
+      md5: 25966e649e444e3fa4f704886f7bed30
+      size: 2156
     - path: src/utils.py
-      md5: aacb0a9bb2fc10515b9f9c07638e5d73
-      size: 2599
+      md5: 6c586ab7ec87f673f7aaea03c60639a0
+      size: 2572
     outs:
-    - path: data/interim/data_clean.csv
-      md5: 8f6b7c87cf3de3a8e180e6e0f8da9d25
-      size: 768615
+    - path: data/interim/data_folds.csv
+      md5: 4496bfe4a244b22800bcbb5788fb16f1
+      size: 1215449
+    - path: data/processed/test.csv
+      md5: aefced9103d3f759e620669cc8a2dc17
+      size: 179155
