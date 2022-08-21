@@ -1,21 +1,27 @@
 schema: '2.0'
 stages:
   clean_dataset:
-    cmd: python3 src/data/clean_data.py --config=params.yaml
+    cmd: python3 src/clean_data.py --config=params.yaml
     deps:
     - path: data/interim/data_folds.csv
-      md5: 4496bfe4a244b22800bcbb5788fb16f1
+      md5: f9f54cbedb3f239d0712ba84b4b97e46
       size: 1215449
-    - path: src/data/clean_data.py
-      md5: 4a305303dda2cdfa0469b322c1c33eae
-      size: 3477
+    - path: data/interim/test.csv
+      md5: aefced9103d3f759e620669cc8a2dc17
+      size: 179155
+    - path: src/clean_data.py
+      md5: 6be3ebdc8047e2aa2e37632010fb69da
+      size: 3977
     - path: src/utils.py
-      md5: 6c586ab7ec87f673f7aaea03c60639a0
-      size: 2572
+      md5: 3a7bd3a3ce13a99af98c69e8343e5e7d
+      size: 2573
     outs:
-    - path: data/interim/data_clean.csv
-      md5: 3b95daf6ae715c7463454d85d0d55911
+    - path: data/processed/data_clean.csv
+      md5: d2cb2f464b0e7b1522896cd357cebc61
       size: 623166
+    - path: data/processed/test_clean.csv
+      md5: f3efd7ee8ea7705e484fc6a0c7ecd1bd
+      size: 90526
   create_folds_dataset:
     cmd: python3 src/data/create_folds_data.py --config=params.yaml
     deps:
@@ -35,3 +41,75 @@ stages:
     - path: data/processed/test.csv
       md5: aefced9103d3f759e620669cc8a2dc17
       size: 179155
+  split_dataset:
+    cmd: python3 src/split_data.py --config=params.yaml
+    deps:
+    - path: data/raw/airline_sentiment_analysis.csv
+      md5: 79c94e0f09cfc1fe2f28d595b138cb02
+      size: 1435353
+    - path: src/split_data.py
+      md5: 2320ec02aa025b688edd57e66d90486b
+      size: 2274
+    - path: src/utils.py
+      md5: 3a7bd3a3ce13a99af98c69e8343e5e7d
+      size: 2573
+    outs:
+    - path: data/interim/data_folds.csv
+      md5: f9f54cbedb3f239d0712ba84b4b97e46
+      size: 1215449
+    - path: data/interim/test.csv
+      md5: aefced9103d3f759e620669cc8a2dc17
+      size: 179155
+  train_and_evaluate:
+    cmd: python3 src/train_and_evaluate.py --config=params.yaml
+    deps:
+    - path: data/processed/data_clean.csv
+      md5: d2cb2f464b0e7b1522896cd357cebc61
+      size: 623166
+    - path: src/build_features.py
+      md5: 7296c0d02aebeac39d040627aa53100c
+      size: 3041
+    - path: src/train_and_evaluate.py
+      md5: 821b7d5683a6955550111dfd17d11dad
+      size: 4490
+    - path: src/utils.py
+      md5: 3a7bd3a3ce13a99af98c69e8343e5e7d
+      size: 2573
+    outs:
+    - path: models/tfv_features.pkl
+      md5: 841925d6c5659d27f28f39d353471b0b
+      size: 2209216
+    - path: reports/params_cv.json
+      md5: c4c0de61d2aa93ae07d714b7f5732a72
+      size: 37
+    - path: reports/scores_cv.json
+      md5: 9d8c7b31d4c1acd347ae34172ce3df9a
+      size: 157
+  predict:
+    cmd: python3 src/predict.py --config=params.yaml
+    deps:
+    - path: data/processed/data_clean.csv
+      md5: d2cb2f464b0e7b1522896cd357cebc61
+      size: 623166
+    - path: data/processed/test_clean.csv
+      md5: f3efd7ee8ea7705e484fc6a0c7ecd1bd
+      size: 90526
+    - path: models/tfv_features.pkl
+      md5: 841925d6c5659d27f28f39d353471b0b
+      size: 2209216
+    - path: src/predict.py
+      md5: 2221f71ece8097501bb1f2171f68aec8
+      size: 3945
+    - path: src/utils.py
+      md5: 3a7bd3a3ce13a99af98c69e8343e5e7d
+      size: 2573
+    outs:
+    - path: models/model.joblib
+      md5: 39842d5b92a9e5c4b73fefd97168672f
+      size: 50724
+    - path: reports/params_test.json
+      md5: c4c0de61d2aa93ae07d714b7f5732a72
+      size: 37
+    - path: reports/scores_test.json
+      md5: addf32a2d934a249dc29877be81bf400
+      size: 157

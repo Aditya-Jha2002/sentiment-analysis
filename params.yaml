@@ -28,5 +28,7 @@ estimators:
 model_dir: models
 
 reports:
-  params: reports/params.json
-  scores: reports/scores.json
+  params_cv: reports/params_cv.json
+  scores_cv: reports/scores_cv.json
+  scores_test: reports/scores_test.json
+  params_test: reports/params_test.json

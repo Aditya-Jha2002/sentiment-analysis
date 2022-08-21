@@ -12,7 +12,10 @@ import json
 class Trainer:
     """Trains a model on the given dataset"""
     def __init__(self, config_path):
+        self.config_path = config_path
+
         config = Utils().read_params(config_path)
+
         self.clean_data_path = config["clean_dataset"]["clean_folds_path"]
         self.model_dir = config["model_dir"]
         self.tfv_artifact_path = config["build_features"]["tfv_artifact_path"]
@@ -21,8 +24,8 @@ class Trainer:
         self.l1_ratio = config["estimators"]["LogisticRegression"]["params"]["l1_ratio"]
         self.random_state = config["base"]["random_state"]
 
-        self.scores_file = config["reports"]["scores"]
-        self.params_file = config["reports"]["params"]
+        self.scores_file = config["reports"]["scores_cv"]
+        self.params_file = config["reports"]["params_cv"]
 
     def train_and_evaluate(self):
         """Train the model and evaluate the model performance"""
@@ -36,12 +39,18 @@ class Trainer:
             running_roc_auc.append(float(roc_auc))
             running_log_loss.append(float(log_loss_score))
 
+        running_accuracy = sum(running_accuracy)/5
+        running_f1 = sum(running_f1)/5
+        running_roc_auc = sum(running_roc_auc)/5
+        running_log_loss = sum(running_log_loss)/5
+
         print("-" * 50)
         print("Logistic Regression Model (C=%f, l1_ratio=%f):" % (self.C, self.l1_ratio))
-        print(f"  ACCURACY: {sum(running_accuracy)/5}")
-        print(f"  F1: {sum(running_f1)/5}")  
-        print(f"  ROC AUC: {sum(running_roc_auc)/5}")
-        print(f"  LOG LOSS: {sum(running_log_loss)/5}")
+        print(f"  ACCURACY: {running_accuracy}")
+        print(f"  F1: {running_f1}")  
+        print(f"  ROC AUC: {running_roc_auc}")
+        print(f"  LOG LOSS: {running_log_loss}")
+        print("-" * 50)
         print("-" * 50)
 
 
@@ -71,7 +80,7 @@ class Trainer:
         store_tfv_artifact = False
         if fold_num == 0:
             store_tfv_artifact = True
-        xtrain_tfv, ytrain, xvalid_tfv, yvalid = BuildFeatures(self.clean_data_path, fold_num, self.tfv_artifact_path ,store_tfv_artifact).build_features()
+        xtrain_tfv, ytrain, xvalid_tfv, yvalid = BuildFeatures(self.config_path).build_features_train(fold_num, store_tfv_artifact)
         
         clf = LogisticRegression(
             C=self.C,

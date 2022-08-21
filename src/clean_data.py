@@ -32,7 +32,7 @@ class DataLoader:
 
         elif df_type == "test":
             initial_data_path = self.test_data_path
-            clean_test_path = self.clean_test_path
+            clean_data_path = self.clean_test_path
 
         # Load the raw data
         df = utils.Utils().get_data(initial_data_path)
@@ -110,4 +110,5 @@ if __name__ == "__main__":
     args.add_argument("--config", default="params.yaml")
     parsed_args = args.parse_args()
 
-    DataLoader(config_path=parsed_args.config).clean_dataset()
+    DataLoader(config_path=parsed_args.config).clean_dataset("train")
+    DataLoader(config_path=parsed_args.config).clean_dataset("test")

@@ -6,27 +6,32 @@ from src.clean_data import DataLoader
 from src.build_features import BuildFeatures 
 import argparse
 import pickle
+import joblib
+import json
+import os
 
 class Predict:
     """ Evaluates the model on the test set"""
     def __init__(self, config_path):
         self.config_path = config_path
         config = Utils().read_params(config_path)
-        self.test_data_path = config["cv_folds_dataset"]["test_data_path"]
-        self.clean_data_path = config["clean_dataset"]["clean_data_path"]
-        self.random_state = config["base"]["random_state"]
+
+        self.clean_folds_path = config["clean_dataset"]["clean_folds_path"]
+        self.clean_test_path = config["clean_dataset"]["clean_test_path"]
         self.model_dir = config["model_dir"]
         self.tfv_artifact_path = config["build_features"]["tfv_artifact_path"]
 
         self.C = config["estimators"]["LogisticRegression"]["params"]["C"]
         self.l1_ratio = config["estimators"]["LogisticRegression"]["params"]["l1_ratio"]
+        self.random_state = config["base"]["random_state"]
+
+        self.scores_file = config["reports"]["scores_test"]
+        self.params_file = config["reports"]["params_test"]
 
     def test(self):
         """Train the model and test the model performance"""
-        train_df = pd.read_csv(self.clean_data_path)
-        test_df = pd.read_csv(self.test_data_path)
-        test_df["text"] = test_df["text"].apply(DataLoader(self.config_path).preprocess_text)
-        test_df["airline_sentiment"] = test_df["airline_sentiment"].map({"negative": 0, "positive": 1})
+        train_df = pd.read_csv(self.clean_folds_path)
+        test_df = pd.read_csv(self.clean_test_path)
         
         train_df = train_df.fillna(" ", axis=1)
         test_df = test_df.fillna(" ", axis=1)
@@ -36,13 +41,10 @@ class Predict:
 
         # Transform the training and test data
         xtrain_tfv = tfv.transform(train_df["text"])
-        ytrain = train_df["airline_sentiment"].values
+        ytrain = train_df["airline_sentiment"].values.astype('int')
 
         xtest_tfv = tfv.transform(test_df["text"])
-        ytest = test_df["airline_sentiment"].values
-
-        ytrain = ytrain.astype('int')
-        ytest = ytest.astype('int')
+        ytest = test_df["airline_sentiment"].values.astype('int')
 
         # Load the model
         clf = LogisticRegression(
@@ -64,6 +66,31 @@ class Predict:
         print(f"  LOG LOSS: {log_loss_score}")
         print("-" * 50)
 
+    #####################################################
+    # Log Parameters and Scores for the deployed modle
+
+        with open(self.scores_file, "w") as f:
+            scores = {
+                "accuracy_score": accuracy,
+                "f1_score": f1,
+                "roc_auc_score": roc_auc,
+                "log_loss": log_loss_score
+            }
+            json.dump(scores, f, indent=4)
+
+        with open(self.params_file, "w") as f:
+            params = {
+                "C": self.C,
+                "l1_ratio": self.l1_ratio,
+            }
+            json.dump(params, f, indent=4)
+    #####################################################
+
+        os.makedirs(self.model_dir, exist_ok=True)
+        model_path = os.path.join(self.model_dir, "model.joblib")
+
+        joblib.dump(clf, model_path)
+
     def _eval_metrics(self, actual, pred, pred_proba):
         """ Takes in the ground truth labels, predictions labels, and prediction probabilities.
             Returns the accuracy, f1, auc_roc, log_loss scores.
@@ -73,8 +100,6 @@ class Predict:
         roc_auc = roc_auc_score(actual, pred_proba[:, 1])
         log_loss_score = log_loss(actual, pred_proba)
         return accuracy, f1, roc_auc, log_loss_score
-
-          
 
 if __name__ == "__main__":
     args = argparse.ArgumentParser()

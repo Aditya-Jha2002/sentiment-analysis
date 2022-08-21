@@ -1,8 +1,8 @@
 stages:
-  create_folds_dataset:
-    cmd: python3 src/data/create_folds_data.py --config=params.yaml
+  split_dataset:
+    cmd: python3 src/split_data.py --config=params.yaml
     deps:
-      - src/create_folds_data.py
+      - src/split_data.py
       - data/raw/airline_sentiment_analysis.csv
       - src/utils.py
     outs:
@@ -21,24 +21,26 @@ stages:
       - data/processed/test_clean.csv
 
   train_and_evaluate:
-    cmd: python3 src/features/train_and_evaluate.py --config=params.yaml
+    cmd: python3 src/train_and_evaluate.py --config=params.yaml
     deps:
       - src/train_and_evaluate.py
+      - src/build_features.py
       - data/processed/data_clean.csv
-      - data/processed/test_clean.csv
       - src/utils.py
     outs:
       - models/tfv_features.pkl
+      - reports/params_cv.json
+      - reports/scores_cv.json
 
   predict:
-    cmd:  python3 src/features/predict.py --config=params.yaml
+    cmd:  python3 src/predict.py --config=params.yaml
     deps:
       - src/predict.py
       - models/tfv_features.pkl
       - data/processed/data_clean.csv
-      - data/processed/test.csv
+      - data/processed/test_clean.csv
       - src/utils.py
     outs:
-      - models/LogisticRegression_model.pkl
-      - reports/params.json
-      - reports/scores.json
+      - models/model.joblib
+      - reports/params_test.json
+      - reports/scores_test.json
