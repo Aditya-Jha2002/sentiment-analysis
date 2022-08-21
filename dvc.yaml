@@ -2,27 +2,30 @@ stages:
   create_folds_dataset:
     cmd: python3 src/data/create_folds_data.py --config=params.yaml
     deps:
-      - src/data/create_folds_data.py
+      - src/create_folds_data.py
       - data/raw/airline_sentiment_analysis.csv
       - src/utils.py
     outs:
-      - data/processed/test.csv
       - data/interim/data_folds.csv
+      - data/interim/test.csv
 
   clean_dataset:
-    cmd: python3 src/data/clean_data.py --config=params.yaml
+    cmd: python3 src/clean_data.py --config=params.yaml
     deps:
-      - src/data/clean_data.py
+      - src/clean_data.py
       - data/interim/data_folds.csv
+      - data/interim/test.csv
       - src/utils.py
     outs:
       - data/processed/data_clean.csv
+      - data/processed/test_clean.csv
 
   train_and_evaluate:
     cmd: python3 src/features/train_and_evaluate.py --config=params.yaml
     deps:
-      - src/features/train_and_evaluate.py
+      - src/train_and_evaluate.py
       - data/processed/data_clean.csv
+      - data/processed/test_clean.csv
       - src/utils.py
     outs:
       - models/tfv_features.pkl
@@ -30,7 +33,7 @@ stages:
   predict:
     cmd:  python3 src/features/predict.py --config=params.yaml
     deps:
-      - src/features/predict.py
+      - src/predict.py
       - models/tfv_features.pkl
       - data/processed/data_clean.csv
       - data/processed/test.csv
