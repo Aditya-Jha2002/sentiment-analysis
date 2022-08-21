@@ -8,32 +8,46 @@ import emoji
 
 from nltk.stem.porter import PorterStemmer
 from nltk.corpus import stopwords
-nltk.download('stopwords')
 
-class DataLoader():
-    """DataLoader class to load the data and preprocess it
-    """
+nltk.download("stopwords")
+
+
+class DataLoader:
+    """DataLoader class to load the data, and preprocess it"""
+
     def __init__(self, config_path):
         config = utils.Utils().read_params(config_path)
-        self.cvfolds_data_path = config["cv_folds_dataset"]["folds_data_path"]
-        self.clean_data_path = config["clean_dataset"]["clean_data_path"]
+        self.folds_data_path = config["split_dataset"]["folds_data_path"]
+        self.test_data_path = config["split_dataset"]["test_data_path"]
+        self.clean_train_path = config["clean_dataset"]["clean_folds_path"]
+        self.clean_test_path = config["clean_dataset"]["clean_test_path"]
 
-    def clean_dataset(self):
-        """ Runs preprocessing scripts to turn folds data from (../interim) into
-            cleaned and pre-processed data ready to be feature engineered on (saved in ../interim).
+    def clean_dataset(self, df_type: str):
+        """Runs preprocessing scripts to turn data given from (../interim) into
+        cleaned and pre-processed data ready to be feature engineered on (saved in ../processed).
         """
+        if df_type == "train":
+            initial_data_path = self.folds_data_path
+            clean_data_path = self.clean_train_path
+
+        elif df_type == "test":
+            initial_data_path = self.test_data_path
+            clean_test_path = self.clean_test_path
+
         # Load the raw data
-        df = utils.Utils().get_data(self.cvfolds_data_path)
+        df = utils.Utils().get_data(initial_data_path)
         # Preprocess the text
-        df['text'] = df['text'].apply(self.preprocess_text)
+        df["text"] = df["text"].apply(self.preprocess_text)
         # Label encode the labels
-        df['airline_sentiment'] = df['airline_sentiment'].map({'negative': 0, 'positive': 1})
+        df["airline_sentiment"] = df["airline_sentiment"].map(
+            {"negative": 0, "positive": 1}
+        )
 
         # Save the clean data
-        df.to_csv(self.clean_data_path, sep=",", index=False)
+        df.to_csv(clean_data_path, sep=",", index=False)
 
     def preprocess_text(self, text: str) -> str:
-        """Preprocess text"""
+        """Preprocess and clean text given"""
         text = self._remove_space(text)
         text = text.lower()
         text = self._remove_contractions(text)
@@ -43,8 +57,7 @@ class DataLoader():
         text = self._remove_stopwords(text)
         text = self._remove_punctuation(text)
         text = self._stem_words(text)
-        
-        
+
         return text
 
     def _remove_space(self, text: str) -> str:
@@ -61,7 +74,7 @@ class DataLoader():
 
     def _remove_mentions(self, text: str) -> str:
         """To remove the mentions from text"""
-        text = re.sub(r'@[^ ]+', '', text)
+        text = re.sub(r"@[^ ]+", "", text)
         return text
 
     def _remove_emoji(self, text: str) -> str:
@@ -71,12 +84,12 @@ class DataLoader():
 
     def _remove_urls(self, text: str) -> str:
         """To remove the urls from text"""
-        text = re.sub(r'http\S+', '', text)
+        text = re.sub(r"http\S+", "", text)
         return text
-    
+
     def _remove_stopwords(self, text: str) -> str:
         """To remove the stopwords"""
-        STOPWORDS = set(stopwords.words('english'))
+        STOPWORDS = set(stopwords.words("english"))
         text = [word for word in str(text).split() if word not in STOPWORDS]
         return " ".join(text)
 
@@ -84,14 +97,15 @@ class DataLoader():
         """To remove the punctuations like !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"""
         text = text.translate(str.maketrans("", "", string.punctuation))
         return text
-    
+
     def _stem_words(self, text: str) -> str:
         """To stem the words"""
         stemmer = PorterStemmer()
         text = [stemmer.stem(word) for word in text.split()]
         return " ".join(text)
- 
-if __name__ == '__main__':
+
+
+if __name__ == "__main__":
     args = argparse.ArgumentParser()
     args.add_argument("--config", default="params.yaml")
     parsed_args = args.parse_args()

@@ -3,8 +3,9 @@ import argparse
 import pandas as pd
 
 
-class Utils():
+class Utils:
     """Helper functions"""
+
     def read_params(self, config_path):
         with open(config_path) as yaml_file:
             config = yaml.safe_load(yaml_file)
@@ -13,6 +14,7 @@ class Utils():
     def get_data(self, data_path):
         df = pd.read_csv(data_path)
         return df
+
 
 contractions = {
     "ain't": "is not",
@@ -91,7 +93,7 @@ contractions = {
     "you'd": "you would",
     "you'll": "you will",
     "you're": "you are",
-    "you've": "you have"
+    "you've": "you have",
 }
 
 if __name__ == "__main__":

@@ -16,6 +16,31 @@ stages:
       - data/interim/data_folds.csv
       - src/utils.py
     outs:
-      - data/interim/data_clean.csv
+      - data/processed/data_clean.csv
+
+  train_and_evaluate:
+    cmd: python3 src/features/train_and_evaluate.py --config=params.yaml
+    deps:
+      - src/features/train_and_evaluate.py
+      - data/processed/data_clean.csv
+      - src/utils.py
+    outs:
+      - models/tfv_features.pkl
+
+  predict:
+    cmd:  python3 src/features/predict.py --config=params.yaml
+    deps:
+      - src/features/predict.py
+      - models/tfv_features.pkl
+      - data/processed/data_clean.csv
+      - data/processed/test.csv
+      - src/utils.py
+    outs:
+      - models/LogisticRegression_model.pkl
+      - reports/params.json
+      - reports/scores.json
 
   
+
+
+

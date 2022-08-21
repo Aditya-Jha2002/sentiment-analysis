@@ -92,8 +92,3 @@ target/
 
 # Mypy cache
 .mypy_cache/
-
-# Makefile
-Makefile
-test_environment.py
-tox.ini

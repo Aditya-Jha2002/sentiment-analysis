@@ -6,18 +6,18 @@ base:
 data_source:
   raw_data_path: data/raw/airline_sentiment_analysis.csv
 
-cv_folds_dataset:
+split_dataset:
   folds_data_path: data/interim/data_folds.csv
   fold_num: 5
-  test_data_path: data/processed/test.csv
+  test_data_path: data/interim/test.csv
   test_size: 0.13
 
 clean_dataset:
-  clean_data_path: data/interim/data_clean.csv
+  clean_folds_path: data/processed/data_clean.csv
+  clean_test_path: data/processed/test_clean.csv
 
 build_features:
-  feature_data_path: data/interim/data_features.csv
-  tfv_artifact_path: src/feature/tfv_features.pkl
+  tfv_artifact_path: models/tfv_features.pkl
 
 estimators:
   LogisticRegression:
