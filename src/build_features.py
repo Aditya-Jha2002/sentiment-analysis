@@ -84,5 +84,5 @@ class BuildFeatures:
         tfv = pickle.load(open(self.tfv_artifact_path, "rb"))
 
         # Fitting TF-IDF to both training and test sets (semi-supervised learning)
-        text_tfv = tfv.transform(text)
+        text_tfv = tfv.transform([text])
         return text_tfv

@@ -12,3 +12,6 @@ pandas
 nltk
 sklearn
 emoji
+pydantic
+fastapi
+uvicorn

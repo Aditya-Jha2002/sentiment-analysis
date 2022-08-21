@@ -37,7 +37,7 @@ class DataLoader:
         # Load the raw data
         df = utils.Utils().get_data(initial_data_path)
         # Preprocess the text
-        df["text"] = df["text"].apply(self.preprocess_text)
+        df["text"] = df["text"].apply(self._preprocess_text)
         # Label encode the labels
         df["airline_sentiment"] = df["airline_sentiment"].map(
             {"negative": 0, "positive": 1}
@@ -46,7 +46,7 @@ class DataLoader:
         # Save the clean data
         df.to_csv(clean_data_path, sep=",", index=False)
 
-    def preprocess_text(self, text: str) -> str:
+    def _preprocess_text(self, text: str) -> str:
         """Preprocess and clean text given"""
         text = self._remove_space(text)
         text = text.lower()
