@@ -4,6 +4,6 @@ class PredRequest(BaseModel):
     text: str
 
 class PredResponse(BaseModel):
-    sentiment: bool
+    sentiment: str
     class Config:
         orm_mode = True
