@@ -4,6 +4,7 @@ base:
   target_col: airline_sentiment
   estimator: LogisticRegression
   vectorizer: TfidfVectorizer
+  metrics: [accuracy, f1, roc_auc, log_loss]
 
 data_source:
   raw_data_path: data/raw/airline_sentiment_analysis.csv
@@ -118,7 +119,7 @@ estimators:
 model_dir: models
 
 reports:
-  params_cv: reports/params_cv.json
+  params: reports/params.json
   scores_cv: reports/scores_cv.json
   scores_test: reports/scores_test.json
-  params_test: reports/params_test.json
+  

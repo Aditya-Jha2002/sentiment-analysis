@@ -19,7 +19,7 @@ class BuildFeatures:
         self.clean_test_path = config["clean_dataset"]["clean_test_path"]
         self.artifact_path = config["build_features"]["artifact_path"]
 
-    def build_features_train(self, fold_num, store_tfv):
+    def build_features_train(self, fold_num):
         """Performs feature engineering to the folds data from (../processed) into
         features ready to be trained by a model (returned in the function).
         """
@@ -40,7 +40,7 @@ class BuildFeatures:
         # Fitting TF-IDF to both training and test sets (semi-supervised learning)
         vec.fit(list(xtrain) + list(xvalid))
 
-        if store_tfv:
+        if fold_num == 0:
             pickle.dump(vec, open(self.artifact_path, "wb"))
 
         xtrain_vec = vec.transform(xtrain)
