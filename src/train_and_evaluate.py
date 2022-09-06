@@ -25,10 +25,7 @@ class Trainer:
 
         self.clean_data_path = config["clean_dataset"]["clean_folds_path"]
         self.model_dir = config["model_dir"]
-        self.tfv_artifact_path = config["build_features"]["tfv_artifact_path"]
 
-        self.C = config["estimators"]["LogisticRegression"]["params"]["C"]
-        self.l1_ratio = config["estimators"]["LogisticRegression"]["params"]["l1_ratio"]
         self.random_state = config["base"]["random_state"]
 
         self.scores_file = config["reports"]["scores_cv"]
@@ -58,20 +55,20 @@ class Trainer:
         pp.pprint(scores)
         print("-" * 50)
 
-        # Log Parameters and Scores for the deployed modle
+        # Log Parameters and Scores for the cross validation
         with open(self.scores_file, "w") as f:
             json.dump(scores, f, indent=4)
 
 
     def _train_one_fold(self, fold_num):
         print(f"Training fold {fold_num} ...")
-        xtrain_tfv, ytrain, xvalid_tfv, yvalid = BuildFeatures(self.config_path).build_features_train(fold_num)
+        xtrain_ft, ytrain, xvalid_ft, yvalid = BuildFeatures(self.config_path).build_features_train(fold_num)
         
         clf = Dispatcher(self.config_path).dispatch_model(self.estimator)
 
-        clf.fit(xtrain_tfv, ytrain)
-        preds = clf.predict(xvalid_tfv)
-        pred_proba = clf.predict_proba(xvalid_tfv)
+        clf.fit(xtrain_ft, ytrain)
+        preds = clf.predict(xvalid_ft)
+        pred_proba = clf.predict_proba(xvalid_ft)
 
         metrics_dict = Metrics(self.config_path).eval_metrics(yvalid, preds, pred_proba)
         

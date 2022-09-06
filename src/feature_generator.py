@@ -48,12 +48,16 @@ class BuildFeatures:
 
         return xtrain_vec, ytrain, xvalid_vec, yvalid
 
-    def build_features_test(self):
+    def build_features_test(self, df_type: str):
         """Performs feature engineering to the test data from (../processed) into
         features ready to be trained by a model (returned in the function).
         """
-        # Load the clean data
-        df = Utils().get_data(self.clean_test_path)
+        if df_type == "test":
+            # Load the clean test data
+            df = Utils().get_data(self.clean_test_path)
+        elif df_type == "train":
+            # Load the clean folds data
+            df = Utils().get_data(self.clean_folds_path)
 
         df.fillna(" ", inplace=True)
 
