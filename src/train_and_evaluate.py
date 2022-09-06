@@ -32,7 +32,6 @@ class Trainer:
         self.random_state = config["base"]["random_state"]
 
         self.scores_file = config["reports"]["scores_cv"]
-        self.params_file = config["reports"]["params_cv"]
 
     def train_and_evaluate(self):
         """Train the model and evaluate the model performance"""
@@ -68,11 +67,7 @@ class Trainer:
         print(f"Training fold {fold_num} ...")
         xtrain_tfv, ytrain, xvalid_tfv, yvalid = BuildFeatures(self.config_path).build_features_train(fold_num)
         
-        clf = LogisticRegression(
-            C=self.C,
-            l1_ratio=self.l1_ratio,
-            solver="liblinear",
-            random_state=self.random_state)
+        clf = Dispatcher(self.config_path).dispatch_model(self.estimator)
 
         clf.fit(xtrain_tfv, ytrain)
         preds = clf.predict(xvalid_tfv)

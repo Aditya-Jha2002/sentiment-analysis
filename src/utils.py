@@ -15,7 +15,6 @@ class Utils:
         df = pd.read_csv(data_path)
         return df
 
-
 contractions = {
     "ain't": "is not",
     "aren't": "are not",
@@ -86,7 +85,7 @@ contractions = {
     "why've": "why have",
     "will've": "will have",
     "won't": "will not",
-    "would've": "would have",
+    "would'vef": "would have",
     "wouldn't": "would not",
     "y'all": "you all",
     "y'all'd": "you all would",
