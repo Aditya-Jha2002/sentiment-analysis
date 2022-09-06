@@ -4,6 +4,7 @@ from nltk.tokenize import word_tokenize
 import nltk
 import pickle
 from sklearn.feature_extraction.text import TfidfVectorizer
+from src.dispatcher import Dispatcher
 
 nltk.download("punkt")
 
@@ -12,10 +13,11 @@ class BuildFeatures:
     """BuildFeatures class to take in train and validation features and perform feature engineering"""
 
     def __init__(self, config_path):
+        self.config_path = config_path
         config = Utils().read_params(config_path)
         self.clean_folds_path = config["clean_dataset"]["clean_folds_path"]
         self.clean_test_path = config["clean_dataset"]["clean_test_path"]
-        self.tfv_artifact_path = config["build_features"]["tfv_artifact_path"]
+        self.artifact_path = config["build_features"]["artifact_path"]
 
     def build_features_train(self, fold_num, store_tfv):
         """Performs feature engineering to the folds data from (../processed) into
@@ -33,29 +35,18 @@ class BuildFeatures:
         yvalid = df[df["kfold"] == fold_num]["airline_sentiment"]
 
         # Create a tfidf vectorizer
-        tfv = TfidfVectorizer(
-            min_df=3,
-            max_features=None,
-            strip_accents="unicode",
-            analyzer="word",
-            token_pattern=r"\w{1,}",
-            ngram_range=(1, 3),
-            use_idf=1,
-            smooth_idf=1,
-            sublinear_tf=1,
-            stop_words="english",
-        )
+        vec = Dispatcher(self.config_path).dispatch_text_vectorizer("tfidf")
 
         # Fitting TF-IDF to both training and test sets (semi-supervised learning)
-        tfv.fit(list(xtrain) + list(xvalid))
+        vec.fit(list(xtrain) + list(xvalid))
 
         if store_tfv:
-            pickle.dump(tfv, open(self.tfv_artifact_path, "wb"))
+            pickle.dump(vec, open(self.artifact_path, "wb"))
 
-        xtrain_tfv = tfv.transform(xtrain)
-        xvalid_tfv = tfv.transform(xvalid)
+        xtrain_vec = vec.transform(xtrain)
+        xvalid_vec = vec.transform(xvalid)
 
-        return xtrain_tfv, ytrain, xvalid_tfv, yvalid
+        return xtrain_vec, ytrain, xvalid_vec, yvalid
 
     def build_features_test(self):
         """Performs feature engineering to the test data from (../processed) into
@@ -70,19 +61,19 @@ class BuildFeatures:
         ytest = df["airline_sentiment"]
 
         # Load TF-IDF
-        tfv = pickle.load(open(self.tfv_artifact_path, "rb"))
+        vec = pickle.load(open(self.artifact_path, "rb"))
 
         # Fitting TF-IDF to both training and test sets (semi-supervised learning)
-        xtest_tfv = tfv.transform(list(xtest))
+        xtest_vec = vec.transform(list(xtest))
 
-        return xtest_tfv, ytest
+        return xtest_vec, ytest
 
     def _build_features_text(self, text: str):
         """Runs feature engineering scripts to turn the text given as input,
         into features ready to be trained by a model (returned in the function).
         """
-        tfv = pickle.load(open(self.tfv_artifact_path, "rb"))
+        vec = pickle.load(open(self.artifact_path, "rb"))
 
         # Fitting TF-IDF to both training and test sets (semi-supervised learning)
-        text_tfv = tfv.transform([text])
-        return text_tfv
+        text_vec = vec.transform([text])
+        return text_vec

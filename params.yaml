@@ -2,6 +2,8 @@ base:
   project: sentiment-analysis
   random_state: 42
   target_col: airline_sentiment
+  estimator: LogisticRegression
+  vectorizer: TfidfVectorizer
 
 data_source:
   raw_data_path: data/raw/airline_sentiment_analysis.csv
@@ -15,9 +17,26 @@ split_dataset:
 clean_dataset:
   clean_folds_path: data/processed/data_clean.csv
   clean_test_path: data/processed/test_clean.csv
-
-build_features:
-  tfv_artifact_path: models/tfv_features.pkl
+  
+feature_generator:
+  TfidfVectorizer:
+    vectorizer_path: models/tfidf_vectorizer.pkl
+    params:
+      min_df: 3
+      max_features: None
+      strip_accents: unicode
+      analyzer: word
+      token_pattern: r"\w{1,}"
+      ngram_range: (1, 3)
+      use_idf: 1
+      smooth_idf: 1
+      sublinear_tf: 1
+      stop_words: english
+  CountVectorizer:
+    vectorizer_path: models/count_vectorizer.pkl
+    params:
+      max_features: 1000
+      ngram_range: (1, 2)
 
 estimators:
   LogisticRegression:
