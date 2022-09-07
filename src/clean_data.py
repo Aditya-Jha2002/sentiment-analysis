@@ -11,7 +11,6 @@ from nltk.corpus import stopwords
 
 nltk.download("stopwords")
 
-
 class DataLoader:
     """DataLoader class to load the data, and preprocess it"""
 
@@ -21,6 +20,8 @@ class DataLoader:
         self.test_data_path = config["split_dataset"]["test_data_path"]
         self.clean_train_path = config["clean_dataset"]["clean_folds_path"]
         self.clean_test_path = config["clean_dataset"]["clean_test_path"]
+
+        self.clean_dict = config["clean_dataset"]["clean_dict"]
 
     def clean_dataset(self, df_type: str):
         """Runs preprocessing scripts to turn data given from (../interim) into
@@ -48,16 +49,26 @@ class DataLoader:
 
     def _preprocess_text(self, text: str) -> str:
         """Preprocess and clean text given"""
-        text = self._remove_space(text)
-        text = text.lower()
-        text = self._remove_contractions(text)
-        text = self._remove_mentions(text)
-        text = self._remove_emoji(text)
-        text = self._remove_urls(text)
-        text = self._remove_stopwords(text)
-        text = self._remove_punctuation(text)
-        text = self._stem_words(text)
-
+        if self.clean_dict["space"]:
+            text = self._remove_space(text)
+        if self.clean_dict["lower"]:
+            text = text.lower()
+        if self.clean_dict["contractions"]:
+            text = self._remove_contractions(text)
+        if self.clean_dict["mentions"]:
+            text = self._remove_mentions(text)
+        if self.clean_dict["emoji"]:
+            text = self._remove_emoji(text)
+        if self.clean_dict["urls"]:
+            text = self._remove_urls(text)
+        if self.clean_dict["stopwords"]:
+            text = self._remove_stopwords(text)
+        if self.clean_dict["punctuation"]:
+            text = self._remove_punctuation(text)
+        if self.clean_dict["stem"]:
+            text = self._stem_words(text)
+        if self.clean_dict["lemmatize"]:
+            text = self._lemmatize_words(text)
         return text
 
     def _remove_space(self, text: str) -> str:
@@ -104,6 +115,11 @@ class DataLoader:
         text = [stemmer.stem(word) for word in text.split()]
         return " ".join(text)
 
+    def _lemmatize_words(self, text: str) -> str:
+        """To lemmatize the words"""
+        lemmatizer = nltk.stem.WordNetLemmatizer()
+        text = [lemmatizer.lemmatize(word) for word in text.split()]
+        return " ".join(text)
 
 if __name__ == "__main__":
     args = argparse.ArgumentParser()

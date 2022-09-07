@@ -13,6 +13,8 @@ nltk
 sklearn
 xgboost
 emoji
+optuna
+mlflow
 pydantic
 fastapi
 uvicorn
