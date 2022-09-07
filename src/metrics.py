@@ -37,7 +37,7 @@ class Metrics:
             metrics_dict["recall"] = recall
 
         if "roc_auc" in self.metrics:
-            roc_auc = roc_auc_score(actual, pred_proba)
+            roc_auc = roc_auc_score(actual, pred_proba[:, 1])
             metrics_dict["roc_auc"] = roc_auc
 
         if "log_loss" in self.metrics:

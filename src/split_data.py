@@ -3,18 +3,21 @@ import argparse
 from src.utils import Utils
 from sklearn.model_selection import train_test_split, StratifiedKFold
 
-
 class CVFoldsDataset:
     """Split the dataset into kfolds dataset and test dataset"""
 
     def __init__(self, config_path):
         config = Utils().read_params(config_path)
+
+        self.random_state = config["base"]["random_state"]
+
         self.raw_data_path = config["data_source"]["raw_data_path"]
+
         self.folds_data_path = config["split_dataset"]["folds_data_path"]
         self.fold_num = config["split_dataset"]["fold_num"]
+
         self.test_data_path = config["split_dataset"]["test_data_path"]
         self.test_size = config["split_dataset"]["test_size"]
-        self.random_state = config["base"]["random_state"]
 
     def cv_folds_dataset(self):
         """Runs scripts to load the raw data from (../raw) into

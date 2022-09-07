@@ -21,7 +21,7 @@ class Trainer:
         config = Utils().read_params(config_path)
 
         self.base = config["base"]
-        self.estimator = config["estimator"]
+        self.estimator = config["base"]["estimator"]
 
         self.clean_data_path = config["clean_dataset"]["clean_folds_path"]
         self.model_dir = config["model_dir"]
@@ -70,7 +70,7 @@ class Trainer:
         preds = clf.predict(xvalid_ft)
         pred_proba = clf.predict_proba(xvalid_ft)
 
-        metrics_dict = Metrics(self.config_path).eval_metrics(yvalid, preds, pred_proba)
+        metrics_dict = Metrics(self.config_path)._eval_metrics(yvalid, preds, pred_proba)
         
         print("-" * 50)
         print(f"  Fold {fold_num} score: \n")

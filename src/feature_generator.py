@@ -17,7 +17,7 @@ class BuildFeatures:
         config = Utils().read_params(config_path)
         self.clean_folds_path = config["clean_dataset"]["clean_folds_path"]
         self.clean_test_path = config["clean_dataset"]["clean_test_path"]
-        self.artifact_path = config["build_features"]["artifact_path"]
+        self.artifact_path = config["feature_generator"]["artifact_path"]
 
     def build_features_train(self, fold_num):
         """Performs feature engineering to the folds data from (../processed) into

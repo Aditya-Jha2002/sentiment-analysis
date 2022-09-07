@@ -67,7 +67,7 @@ class DataLoader:
             text = self._remove_punctuation(text)
         if self.clean_dict["stem"]:
             text = self._stem_words(text)
-        if self.clean_dict["lemmatize"]:
+        if self.clean_dict["lemm"]:
             text = self._lemmatize_words(text)
         return text
 

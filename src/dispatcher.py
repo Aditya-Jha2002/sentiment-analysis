@@ -19,19 +19,19 @@ class Dispatcher:
     """
     def __init__(self, config_path):
         config = Utils().read_params(config_path)
-        self.params_file = config["reports"]["params_cv"]
+        self.params_file = config["reports"]["params"]
         
         self.MODELS = {
-            "naive_bayes": naive_bayes.MultinomialNB(**config["estimators"]["NaiveBayes"]["params"]),
-            "logistic_regression": linear_model.LogisticRegression(**config["estimators"]["LogisticRegression"]["params"]),
-            "decision_tree": tree.DecisionTreeClassifier(**config["estimators"]["DecisionTree"]["params"]),
-            "random_forest": ensemble.RandomForestClassifier(**config["estimators"]["RandomForest"]["params"]),
-            "xgboost": xgb.XGBClassifier(**config["estimators"]["XGBoost"]["params"]),
+            "MultinomialNB": naive_bayes.MultinomialNB(**config["estimators"]["MultinomialNB"]["params"]),
+            "LogisticRegression": linear_model.LogisticRegression(**config["estimators"]["LogisticRegression"]["params"]),
+            "DecisionTree": tree.DecisionTreeClassifier(**config["estimators"]["DecisionTree"]["params"]),
+            "RandomForest": ensemble.RandomForestClassifier(**config["estimators"]["RandomForest"]["params"]),
+            "XGBoost": xgb.XGBClassifier(**config["estimators"]["XGBoost"]["params"]),
         }
 
         self.VECTORIZERS = {
-            "tfidf": text.TfidfVectorizer(**config["vectorizers"]["TfidfVectorizer"]["params"]),
-            "count": text.CountVectorizer(**config["vectorizers"]["CountVectorizer"]["params"]),
+            "tfidf": text.TfidfVectorizer(**config["feature_generator"]["TfidfVectorizer"]["params"]),
+            "count": text.CountVectorizer(**config["feature_generator"]["CountVectorizer"]["params"]),
         }
 
     def dispatch_model(self, model_name, log_params=False, df_type="train"):

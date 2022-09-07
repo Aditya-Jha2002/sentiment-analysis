@@ -76,12 +76,10 @@ target/
 .ipynb_checkpoints/
 
 # exclude data from source control by default
-/data/raw/airline_sentiment_analysis.csv/
-/data/interim/data_clean.csv/
-/data/interim/data_features.csv/
-/data/processed/train.csv/
-/data/processed/dev.csv/
-/data/processed/test.csv/
+data
+
+# exclude models and outputs from source control by default
+models
 
 # Mac OS-specific storage files
 .DS_Store

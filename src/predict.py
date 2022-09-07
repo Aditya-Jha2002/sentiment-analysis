@@ -20,10 +20,12 @@ class Predict:
         self.config_path = config_path
         config = Utils().read_params(config_path)
 
+        self.estimator = config["base"]["estimator"]
+
         self.clean_folds_path = config["clean_dataset"]["clean_folds_path"]
         self.clean_test_path = config["clean_dataset"]["clean_test_path"]
         self.model_dir = config["model_dir"]
-        self.vectorizer_path = config["vectorizer"]["vectorizer_path"]
+        self.vectorizer_path = config["feature_generator"]["artifact_path"]
 
         self.random_state = config["base"]["random_state"]
 
@@ -32,17 +34,17 @@ class Predict:
     def test(self):
         """Train the model and test the model performance"""
         # Load the vectors and labels
-        xtrain_ft, ytrain = BuildFeatures(self.config_path).build_features(self.clean_folds_path, "train")
-        xtest_ft, ytest = BuildFeatures(self.config_path).build_features(self.clean_test_path, "test")
+        xtrain_ft, ytrain = BuildFeatures(self.config_path).build_features_test("train")
+        xtest_ft, ytest = BuildFeatures(self.config_path).build_features_test("test")
 
         # Load the model
-        clf = Dispatcher(self.config_path).get_model("logistic_regression")
+        clf = Dispatcher(self.config_path).dispatch_model(self.estimator)
 
         clf.fit(xtrain_ft, ytrain)
         preds = clf.predict(xtest_ft)
         pred_proba = clf.predict_proba(xtest_ft)
 
-        metrics_dict = Metrics(self.config_path).get_metrics(ytest, preds, pred_proba)
+        metrics_dict = Metrics(self.config_path)._eval_metrics(ytest, preds, pred_proba)
         
         print("-" * 50)
         pp.pprint(metrics_dict)
